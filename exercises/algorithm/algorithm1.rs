@@ -66,20 +66,37 @@ impl<T> LinkedList<T> {
             },
         }
     }
-    pub fn merge(list_a: LinkedList<T>, list_b: LinkedList<T>) -> Self {
-        let mut merged_list = LinkedList::<T>::new();
+    pub fn merge(list_a: LinkedList<T>, list_b: LinkedList<T>) -> Self
+    where
+        T: Clone + PartialOrd,
+    {
+        //TODO
 
-        let mut current_a = list_a.start;
-        let mut current_b = list_b.start;
-        while let (Some(node_a), Some(node_b)) = (current_a, current_b) {
-            if *(node_a.as_ptr()).val <= *(node_b.as_ptr()).val {
-                merged_list.add(*(node_a.as_ptr()).val);
-                current_a = (*node_a.as_ptr()).next;
+        let mut merged_list = LinkedList::new();
+        let mut a_current = list_a.start;
+        let mut b_current = list_b.start;
+        while let (Some(a_node), Some(b_node)) = (a_current, b_current) {
+            let a_val = unsafe{ (*a_node.as_ptr()).val.clone() };
+            let b_val = unsafe{ (*b_node.as_ptr()).val.clone() };
+            if a_val <= b_val {
+                merged_list.add(a_val.clone());
+                a_current = unsafe{(*a_node.as_ptr()).next};
             } else {
-                merged_list.add(*(node_b.as_ptr()).val);
-                current_b = (*node_b.as_ptr()).next;
+                merged_list.add(b_val.clone());
+                b_current = unsafe{(*b_node.as_ptr()).next};
             }
         }
+        while let Some(a_node) = a_current {
+            let a_val = unsafe { (*a_node.as_ptr()).val.clone() };
+            merged_list.add(a_val.clone());
+            a_current = unsafe{(*a_node.as_ptr()).next};
+        }
+        while let Some(b_node) = b_current {
+            let b_val = unsafe{ (*b_node.as_ptr()).val.clone() };
+            merged_list.add(b_val.clone());
+            b_current = unsafe{(*b_node.as_ptr()).next};
+        }
+        merged_list
     }
 }
 
