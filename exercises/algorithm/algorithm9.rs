@@ -1,8 +1,7 @@
 /*
-	heap
-	This question requires you to implement a binary heap function
+    heap
+    This question requires you to implement a binary heap function
 */
-// I AM NOT DONE
 
 use std::cmp::Ord;
 use std::default::Default;
@@ -37,9 +36,32 @@ where
     }
 
     pub fn add(&mut self, value: T) {
-        //TODO
+        self.count += 1;
+        self.items.push(value);
+        self.bubble_up(self.count);
     }
-
+    fn bubble_up(&mut self, mut idx: usize) {
+        while idx > 1 {
+            let parent_idx = self.parent_idx(idx);
+            if (self.comparator)(&self.items[idx], &self.items[parent_idx]) {
+                self.items.swap(idx, parent_idx);
+                idx = parent_idx;
+            } else {
+                break;
+            }
+        }
+    }
+    fn bubble_down(&mut self, mut idx: usize) {
+        while self.children_present(idx) {
+            let smallest_child = self.smallest_child_idx(idx);
+            if (self.comparator)(&self.items[smallest_child], &self.items[idx]) {
+                self.items.swap(idx, smallest_child);
+                idx = smallest_child;
+            } else {
+                break;
+            }
+        }
+    }
     fn parent_idx(&self, idx: usize) -> usize {
         idx / 2
     }
@@ -57,8 +79,15 @@ where
     }
 
     fn smallest_child_idx(&self, idx: usize) -> usize {
-        //TODO
-		0
+        let l = self.left_child_idx(idx);
+        let r = self.right_child_idx(idx);
+        if r > self.count {
+            l
+        } else if (self.comparator)(&self.items[l], &self.items[r]) {
+            l
+        } else {
+            r
+        }
     }
 }
 
@@ -84,8 +113,16 @@ where
     type Item = T;
 
     fn next(&mut self) -> Option<T> {
-        //TODO
-		None
+        if self.is_empty() {
+            return None;
+        } else {
+            let result = self.items.swap_remove(1);
+            self.count -= 1;
+            if !self.is_empty() {
+                self.bubble_down(1);
+            }
+            Some(result)
+        }
     }
 }
 
